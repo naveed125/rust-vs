@@ -4,20 +4,35 @@ def generate_random_strings(count=10000):
     # Dictionary to store strings and their counts
     string_counts = {}
     
-    # Get current timestamp to vary between runs
-    base_seed = int(time.time() * 1000)
+    # Get current timestamp for initial seeds
+    timestamp = int(time.time() * 1000)
+    
+    # Set up Xorshift+ state (needs two 64-bit seeds)
+    state0 = timestamp ^ 0xDEADBEEF  # XOR with arbitrary constant
+    state1 = (timestamp << 21) ^ 0x95419C24A637B12F  # Another arbitrary constant
     
     # Generate 10000 random strings
     for i in range(count):
         # Generate a pseudorandom string of length 8
         random_string = ""
-        # Create a unique seed for each iteration
-        seed = base_seed + i
         
         for _ in range(8):
-            # Simple linear congruential generator
-            seed = (seed * 1103515245 + 12345) % 2**31
-            rand_num = seed % 62
+            # Xorshift+ algorithm (much better statistical properties than LCG)
+            s1 = state0 & 0xFFFFFFFFFFFFFFFF  # Ensure 64-bit unsigned
+            s0 = state1
+            
+            # Update state
+            state0 = s0
+            s1 ^= s1 << 23
+            s1 &= 0xFFFFFFFFFFFFFFFF  # Ensure 64-bit unsigned
+            state1 = s1 ^ s0 ^ (s1 >> 18) ^ (s0 >> 5)
+            state1 &= 0xFFFFFFFFFFFFFFFF  # Ensure 64-bit unsigned
+            
+            # Get random value
+            rand_value = (state1 + s0) & 0xFFFFFFFFFFFFFFFF
+            
+            # Use just enough bits for our character range (0-61)
+            rand_num = rand_value % 62
             
             # Convert to character
             if rand_num < 10:  # 0-9
