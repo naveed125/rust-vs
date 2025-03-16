@@ -14,3 +14,4 @@ __pycache__/
 *.a
 *.lib
 *.exp
+*.class
