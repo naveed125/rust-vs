@@ -1,14 +1,14 @@
 import time
 
-def generate_random_strings():
+def generate_random_strings(count=10000):
     # Dictionary to store strings and their counts
     string_counts = {}
     
     # Get current timestamp to vary between runs
     base_seed = int(time.time() * 1000)
     
-    # Generate 1000 random strings
-    for i in range(10000):
+    # Generate 10000 random strings
+    for i in range(count):
         # Generate a pseudorandom string of length 8
         random_string = ""
         # Create a unique seed for each iteration
@@ -37,23 +37,21 @@ def generate_random_strings():
     
     return string_counts
 
+
 # Run the function 3 times and measure execution time
 total_time = 0
 for i in range(3):
     start_time = time.time()
-    string_counts = generate_random_strings()
+    string_counts = generate_random_strings(10000)  # Generate 10000 strings
     end_time = time.time()
     
     # Convert seconds to milliseconds
     execution_time_ms = (end_time - start_time) * 1000
     total_time += execution_time_ms
-    print(f"Run {i+1}: {execution_time_ms:.2f} milliseconds")
     
-    # Print a sample of unique strings generated and collision count
-    collision_count = sum(count > 1 for count in string_counts.values())
-    print(f"  - Unique strings: {len(string_counts)}")
-    print(f"  - Strings with collisions: {collision_count}")
+    # Print in CSV format to console
+    print(f"{execution_time_ms:.2f}\t",end="")
 
 # Calculate and print the average execution time in milliseconds
 average_time_ms = total_time / 3
-print(f"\nAverage execution time: {average_time_ms:.2f} milliseconds")
+print(f"{average_time_ms:.2f}")
