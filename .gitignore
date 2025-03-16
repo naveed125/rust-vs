@@ -1,2 +1,16 @@
 .venv/
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzw
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.exp
