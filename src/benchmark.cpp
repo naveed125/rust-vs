@@ -90,6 +90,7 @@ int main() {
     state1 = (timestamp << 21) ^ 0x95419C24A637B12F; // Arbitrary constant
 
     double total_time = 0.0;
+    // @naveed125: the line below may be the reason C++ benchmark beats the current rust version
     hashTable.reserve(HASH_TABLE_SIZE);
     // Run 3 times and measure execution time
     for (int i = 0; i < 3; i++) {
