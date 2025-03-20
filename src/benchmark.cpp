@@ -2,9 +2,8 @@
 // Created by Alexander Pototskiy on 18.03.25.
 //
 
-#include <iostream>
 #include <unordered_map>
-#include <cstring>
+#include <string_view>
 
 #define STRING_COUNT 10000
 #define STRING_LENGTH 8
@@ -12,38 +11,36 @@
 
 uint64_t state0, state1;
 
-template <size_t SizeV>
+template <size_t SizeV, bool UseCStrV = false>
 class small_fixed_string
 {
-    char data_[SizeV + 1];
+    char data_[SizeV + UseCStrV];
 
 public:
     inline small_fixed_string() noexcept
     {
-        data_[SizeV] = 0;
+        if constexpr (UseCStrV)
+            data_[SizeV] = 0;
     }
 
     inline char * data() noexcept { return data_; }
     inline char const* data() const noexcept { return data_; }
 
-    friend inline bool operator==(small_fixed_string const& rls, small_fixed_string const& rhs) noexcept
-    {
-        return 0 == std::memcmp(rls.data_, rhs.data_, SizeV);
-    }
+    friend inline bool operator==(small_fixed_string const&, small_fixed_string const&) noexcept = default;
 
     friend inline size_t hash_value(small_fixed_string const& s) noexcept
     {
-        return std::hash<std::string_view>()(std::string_view{s.data_, SizeV});
+        return std::hash<std::string_view>()({s.data_, SizeV});
     }
 };
 
 struct small_fixed_string_hash
 {
-    template <size_t SizeV>
-    inline size_t operator()(small_fixed_string<SizeV> const& value) const noexcept { return hash_value(value); }
+    template <size_t SizeV, bool UseCStrV>
+    inline size_t operator()(small_fixed_string<SizeV, UseCStrV> const& value) const noexcept { return hash_value(value); }
 };
 
-using string_type = small_fixed_string<STRING_LENGTH>;
+using string_type = small_fixed_string<STRING_LENGTH, false>;
 
 std::unordered_map<string_type, uint64_t, small_fixed_string_hash> hashTable;
 
@@ -63,8 +60,7 @@ static const char CHARSET[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLM
 
 // Function to generate `count` random strings and store them in a hash table
 void generate_random_strings(int count) {
-    hashTable.clear();
-    small_fixed_string<STRING_LENGTH> random_string;
+    string_type random_string;
 
     for (int i = 0; i < count; i++) {
         for (char * data = random_string.data(), *edata = data + STRING_LENGTH; data != edata; ++data) {
@@ -100,6 +96,7 @@ int main() {
         double exec_time = get_execution_time();
         total_time += exec_time;
         printf("%.2f\t", exec_time);
+        hashTable.clear();
     }
 
     // Print average execution time
