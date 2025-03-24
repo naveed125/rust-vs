@@ -1,12 +1,13 @@
 #!/usr/bin/env julia
-print("Package management ...\n")
+# print("Package management ...\n")
 using Pkg
 Pkg.activate(".")
 # Next line needed only on first run
-Pkg.add( ["Random", "BenchmarkTools"] )
+# Pkg.add( ["Random", "BenchmarkTools", "Printf"] )
+using Printf
 using Random
 using BenchmarkTools
-print("Package management done\n\n")
+# print("Package management done\n\n")
 
 function gen_strings(n::UInt64, l::UInt64)
     """
@@ -17,7 +18,7 @@ function gen_strings(n::UInt64, l::UInt64)
     """
     charset = union( 'a':'z', 'A':'Z', '0':'9')
     return [String(rand(charset, l)) for _ in 1:n]
-end
+end # gen_strings()
 
 function check_dups(strings::Vector{String})
     """
@@ -33,34 +34,45 @@ function check_dups(strings::Vector{String})
             dups += 1
         else
             seen[s] = 1
-        end
-    end
+        end # if haskey()
+    end # end for s
     return dups
-end
+end # check_dups()
 
 function run_experiment(n::UInt64, length::UInt64, iterations::UInt64)
+    """
+    run_experiment runs a complete cycle of 'iterations' loops, generating
+                   'n' strings of 'length' chars each, removes duplicates
+                   and returns the time taken by each cycle
+    Input: n, number of strigs to randomly generate, length in chars of each string,
+           iterations, how many times to do the generation and duplicate removal
+    Output: a vector of Float64 with the times taken by each loop
+    """
     runtimes = Float64[]
     for _ in 1:iterations
         runtime = @elapsed begin
             strings = gen_strings(n, length)
             duplicates = check_dups(strings)
-            println("Duplicates found: $(duplicates)")
-        end
+            # println("Duplicates found: $(duplicates)")
+        end # @elapsed begin
         push!(runtimes, runtime)
-    end
+    end # for _
     return runtimes
-end
+end # fn run_experiment()
 
 function main()
-    n::UInt64 = 10_000
-    length::UInt64 = 8
-    iterations::UInt64 = 3
+    LOOPS::UInt64 = 3                 # number of iterations
+    STRING_COUNT::UInt64 = 10_000     # number of random strings in a dict
+    STRING_LENGTH::UInt64 = 8         # length of each string
+    FPDIGITS::UInt8 = 2               # precision of fp numbers to show
 
-    runtimes = run_experiment(n, length, iterations)
-    average_runtime = mean(runtimes)
-
-    println("Runtimes: $(runtimes)")
-    println("Average runtime: $(average_runtime) seconds")
-end
+    runtimes = run_experiment(STRING_COUNT, STRING_LENGTH, LOOPS)
+    
+    for rt in runtimes
+      @printf "%.*f\t" FPDIGITS 1000rt # I guess we needed to multiply by 1000
+    end # for rt
+    @printf "%.*f\n" FPDIGITS mean(runtimes)
+    
+end # fn main()
 
 main()
