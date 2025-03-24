@@ -37,23 +37,22 @@ namespace benchmark.cs
     public static readonly int STRING_COUNT = 10_000;
     public static readonly int STRING_LENGTH = 8;
     public static readonly char[] CHARSET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+    public static readonly ulong CHARSET_LENGTH = (ulong)CHARSET.Length;
     public static readonly int RUNS = 3;
 
-    public static string RandomString(XorShift random)
+    private static string RandomString(XorShift random)
     {
       var result = new StringBuilder(STRING_LENGTH);
 
       for (int i = 0; i < STRING_LENGTH; i++)
       {
-        var randIndex = Math.Abs((int)random.Next() % CHARSET.Length);
-
-        result.Append(CHARSET[randIndex]);
+        result.Append(CHARSET[random.Next() % CHARSET_LENGTH]);
       }
 
       return result.ToString();
     }
 
-    public static IReadOnlyDictionary<string, int> GenerateStrings(int count)
+    private static IReadOnlyDictionary<string, int> GenerateStrings(int count)
     {
       var random = new XorShift();
       var stringCounts = new Dictionary<string, int>();
@@ -68,7 +67,7 @@ namespace benchmark.cs
       return stringCounts;
     }
 
-    public static double measureExecutionTime()
+    private static double measureExecutionTime()
     {
       var stopwatch = new Stopwatch();
 
@@ -76,10 +75,10 @@ namespace benchmark.cs
       GenerateStrings(STRING_COUNT);
       stopwatch.Stop();
 
-      return stopwatch.ElapsedMilliseconds;
+      return Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
     }
 
-    public static void Main(string[] args)
+    public static void Main()
     {
       var totalTime = 0.0;
       var times = new double[RUNS];
