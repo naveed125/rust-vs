@@ -5,3 +5,4 @@ How fast is rust compared to other languages. A benchmarking excercise for fun. 
 * [Naveed Khan](https://github.com/naveed125) for the original Python code
 * [ChatGPT](https://chatgpt.com/) for translating to PHP, Ruby, Elixir, JavaScript, Java, C, Go & Rust 
 * [Alexander Pototskiy](https://github.com/apotocki) for the optimized C++ version
+* [Ramón Barrios](https://github.com/ColombianJoker) for the Julia code
