@@ -25,7 +25,8 @@ function check_dups(strings::Vector{String})
     check_dups returns a dictionary of strings, with the strings as keys and a number
                of times each string apperars in the input vector
     Input: strings, a vector of strings
-    Output: a dictionary of { "string1" => times1, "string2" => times2, ... }
+    Output: a tuple, with the number of duplicates as element 0 and a dictionary
+            of { "string1" => times1, "string2" => times2, ... } as element 1
     """
     seen = Dict{String, UInt64}()
     dups = 0
@@ -36,7 +37,7 @@ function check_dups(strings::Vector{String})
             seen[s] = 1
         end # if haskey()
     end # end for s
-    return dups
+    return (dups, seen)
 end # check_dups()
 
 function run_experiment(n::UInt64, length::UInt64, iterations::UInt64)
@@ -52,7 +53,7 @@ function run_experiment(n::UInt64, length::UInt64, iterations::UInt64)
     for _ in 1:iterations
         runtime = @elapsed begin
             strings = gen_strings(n, length)
-            duplicates = check_dups(strings)
+            n_duplicates, seen = check_dups(strings)
             # println("Duplicates found: $(duplicates)")
         end # @elapsed begin
         push!(runtimes, runtime)
